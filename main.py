@@ -100,7 +100,7 @@ async def handle_message(update: Update,
 
 def main() -> None:
     """تشغيل البوت"""
-    application = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
+    application = Application.builder().token(TELEGRAM_BOT_TOKEN).build()application = Application.builder().token(TELEGRAM_BOT_TOKEN).connect_timeout(30).read_timeout(30).build()
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(
