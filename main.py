@@ -61,24 +61,20 @@ async def handle_message(update: Update,
         return
 
     try:
-        # التعامل مع الرسائل النصية
+        # إرسال الرسالة الأصلية إلى القناة
         if message.text:
-            sent_msg = await context.bot.send_message(chat_id=CHANNEL_ID,
-                                                      text=message.text)
+            await context.bot.send_message(chat_id=CHANNEL_ID,
+                                           text=message.text)
 
-        # التعامل مع الصور
         elif message.photo:
-            sent_msg = await context.bot.send_photo(
-                chat_id=CHANNEL_ID,
-                photo=message.photo[-1].file_id,
-                caption=message.caption)
+            await context.bot.send_photo(chat_id=CHANNEL_ID,
+                                         photo=message.photo[-1].file_id,
+                                         caption=message.caption)
 
-        # التعامل مع الفيديو
         elif message.video:
-            sent_msg = await context.bot.send_video(
-                chat_id=CHANNEL_ID,
-                video=message.video.file_id,
-                caption=message.caption)
+            await context.bot.send_video(chat_id=CHANNEL_ID,
+                                         video=message.video.file_id,
+                                         caption=message.caption)
 
         else:
             await message.reply_text(
@@ -89,12 +85,19 @@ async def handle_message(update: Update,
         user = message.from_user
         user_name = user.first_name or "بدون اسم"
         username = f"@{user.username}" if user.username else "بدون يوزر"
-        user_info = f" الاسم: {user_name}\n اليوزر: {username}"
+        user_id = user.id
 
-        # إرسال معلومات المرسل بعد الرسالة الأصلية
-        await context.bot.send_message(chat_id=CHANNEL_ID, text=user_info)
+        # تكوين رسالة المعلومات
+        user_info = (f" الاسم: {user_name}\n"
+                     f" اليوزر: {username}\n"
+                     f" الآيدي: `{user_id}`")
 
-        # إرسال تأكيد للمستخدم
+        # إرسال المعلومات إلى القناة
+        await context.bot.send_message(chat_id=CHANNEL_ID,
+                                       text=user_info,
+                                       parse_mode="Markdown")
+
+        # تأكيد للمستخدم
         await message.reply_text("رسالتك وصلت بكل سرية 😏")
 
     except Exception as e:
@@ -102,6 +105,7 @@ async def handle_message(update: Update,
         await message.reply_text(
             "حدث خطأ أثناء إرسال الرسالة. قد لا يملك البوت صلاحيات كافية في القناة."
         )
+
 
 def main() -> None:
     """تشغيل البوت"""
