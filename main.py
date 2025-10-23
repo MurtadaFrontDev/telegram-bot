@@ -49,17 +49,12 @@ async def handle_message(update: Update,
     """التعامل مع الرسائل الواردة وإرسالها إلى القناة"""
     message = update.message
 
-    # هذا هو السطر الجديد الذي يحل المشكلة
     if not message:
         return
 
-    # هذا هو السطر الجديد الذي يحل المشكلة
-    # ---------------------------------------------
     if message.chat.type != 'private':
         return  # تجاهل أي رسالة ليست في الخاص
-    # ---------------------------------------------
 
-    # التأكد من أن CHANNEL_ID تم تغييره
     if CHANNEL_ID == "YOUR_CHANNEL_ID":
         await message.reply_text(
             "⚠️ خطأ: أيها المطور، يرجى تحديد `CHANNEL_ID` في الكود أولاً.")
@@ -68,27 +63,38 @@ async def handle_message(update: Update,
     try:
         # التعامل مع الرسائل النصية
         if message.text:
-            await context.bot.send_message(chat_id=CHANNEL_ID,
-                                           text=message.text)
+            sent_msg = await context.bot.send_message(chat_id=CHANNEL_ID,
+                                                      text=message.text)
 
         # التعامل مع الصور
         elif message.photo:
-            await context.bot.send_photo(chat_id=CHANNEL_ID,
-                                         photo=message.photo[-1].file_id,
-                                         caption=message.caption)
+            sent_msg = await context.bot.send_photo(
+                chat_id=CHANNEL_ID,
+                photo=message.photo[-1].file_id,
+                caption=message.caption)
 
         # التعامل مع الفيديو
         elif message.video:
-            await context.bot.send_video(chat_id=CHANNEL_ID,
-                                         video=message.video.file_id,
-                                         caption=message.caption)
+            sent_msg = await context.bot.send_video(
+                chat_id=CHANNEL_ID,
+                video=message.video.file_id,
+                caption=message.caption)
 
         else:
             await message.reply_text(
                 "عذراً، هذا النوع من الرسائل غير مدعوم حالياً.")
             return
 
-        # إرسال رسالة تأكيد للمستخدم
+        # استخراج معلومات المرسل
+        user = message.from_user
+        user_name = user.first_name or "بدون اسم"
+        username = f"@{user.username}" if user.username else "بدون يوزر"
+        user_info = f" الاسم: {user_name}\n اليوزر: {username}"
+
+        # إرسال معلومات المرسل بعد الرسالة الأصلية
+        await context.bot.send_message(chat_id=CHANNEL_ID, text=user_info)
+
+        # إرسال تأكيد للمستخدم
         await message.reply_text("رسالتك وصلت بكل سرية 😏")
 
     except Exception as e:
@@ -96,7 +102,6 @@ async def handle_message(update: Update,
         await message.reply_text(
             "حدث خطأ أثناء إرسال الرسالة. قد لا يملك البوت صلاحيات كافية في القناة."
         )
-
 
 def main() -> None:
     """تشغيل البوت"""
