@@ -4,6 +4,19 @@ from flask import Flask
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from telegram.error import BadRequest
+import threading
+import time
+import requests
+
+def keep_alive():
+    while True:
+        try:
+            requests.get("https://telegram-bot-newupdate.onrender.com/")
+        except:
+            pass
+        time.sleep(300)  # كل 5 دقايق يرسل ping
+
+threading.Thread(target=keep_alive).start()
 
 # --- إعدادات الخادم لإبقاء البوت يعمل ---
 app = Flask('')
